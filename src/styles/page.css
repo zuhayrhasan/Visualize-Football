@@ -108,11 +108,11 @@
 }
 
 .season > .league {
-    width: 69%;
+    width: 64%;
 }
 
 .season > .year {
-    width: 24%;
+    width: 29%;
 }
 
 .league, .year select {

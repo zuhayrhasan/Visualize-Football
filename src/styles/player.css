@@ -1,0 +1,121 @@
+.players {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 550px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.player {
+    height: 500px;
+    width: 200px;
+    padding: 1% 2%;
+    border-radius: 10px;
+    margin-right: 20px;
+    background: linear-gradient(145deg, var(--box-color), #d5d5d5);
+    box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.4);
+}
+
+.player h4 {
+    margin: 0;
+    color: var(--box-text);
+    text-align: center;
+    margin-bottom: 5%;
+}
+
+.dropdowns {
+    border-top: 1.5px solid var(--background);
+    border-bottom: 1.5px solid var(--background);
+    padding: 10% 0%;
+}
+
+.players .player:last-child {
+    margin-right: 0;
+}
+
+.dropdowns select {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    width: 100%;
+    border-radius: 50px;
+    border: 0;
+    outline: 0;
+    margin-bottom: 15px !important;
+    padding: 2.5px 7.5px;
+    color: var(--box-text);
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.1);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+}
+
+.year select {
+    text-align: center;
+}
+
+.dropdowns select:last-child {
+    margin-bottom: 5%;
+}
+
+.dropdowns select:disabled {
+    background-color: rgba(0, 13, 46, 0.5);
+    box-shadow: none;
+}
+
+.dropdowns select:focus {
+    box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.3);
+    border: none;
+    outline: none;
+    outline-offset: 2px;
+}
+
+.dropdowns option:first-child {
+    display: none;
+}
+
+.dropdowns label {
+    font-family: 'Poppins', sans-serif;
+    color: var(--box-text);
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 2.5px;
+}
+
+.dropdowns > .season {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.season > .league {
+    width: 64%;
+}
+
+.season > .year {
+    width: 29%;
+}
+
+.league, .year select {
+    width: 100%;
+}
+
+.player > .club, .player > .name {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+
+    .player-container {
+        height: 400px;
+        width: 200px;
+    }
+    
+}

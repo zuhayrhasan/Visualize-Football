@@ -1,0 +1,65 @@
+.player-names {
+    display: flex;
+
+}
+
+.graph-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 50%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.graph-square {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: clamp(20rem, 3.3333rem + 34.7222vw, 45rem);
+    width: clamp(20rem, 3.3333rem + 34.7222vw, 45rem);
+    background: linear-gradient(145deg, var(--box-color), #d5d5d5);
+    box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.4);
+    padding: 25px;
+    border-radius: 25px;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.graph-visible {
+    opacity: 1 !important;
+}
+
+
+.names-header {
+    position: absolute;
+    top: -10rem;
+    height: 5rem;
+    width: 100%;
+}
+
+.attributes-header {
+    position: absolute;
+    top: -5rem;
+    height: 5rem;
+    width: 100%;
+}
+
+
+
+
+
+
+@media (max-width: 768px) {
+
+    .graph-square {
+        height: clamp(15rem, 9.4219rem + 32.4544vw, 25rem);
+        width: clamp(15rem, 9.4219rem + 32.4544vw, 25rem);
+    }
+
+}

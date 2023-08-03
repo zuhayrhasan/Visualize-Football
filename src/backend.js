@@ -87,10 +87,10 @@ app.get('/fetchPlayers', async (req, res) => {
             } else {
 
                 // If there are no more pages, filter and map the data as before
-                // Get players who played at least 5 games in the league
+                // Get players who played at least 10 full games in the league
                 const filteredPlayerData = updatedPlayersData.filter((player) =>
                     player.statistics[0].league.id == leagueValue &&
-                    player.statistics[0].games.appearences >= 5
+                    player.statistics[0].games.minutes >= 900
                 );
         
                 const playerData = filteredPlayerData.map((player) => ({

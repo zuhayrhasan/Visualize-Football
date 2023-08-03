@@ -1,94 +1,92 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto'; 
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import axios from 'axios';
 import '../styles/page.css';
 import '../styles/player.css';
 import '../styles/graph.css';
 
+import Player from '../components/player.js';
+
 const Page = () => {
 
-    const [leagueValue, setLeagueValue] = useState('');
-    const [yearValue, setYearValue] = useState('');
-    const [clubValue, setClubValue] = useState('');
-    const [nameValue, setNameValue] = useState('');
+    const [P1Stats, setP1Stats] = useState([]);
+    const [P2Stats, setP2Stats] = useState([]);
 
-    const [teamData, setTeamData] = useState([]);
-    const [playerData, setPlayerData] = useState([]);
+    const [P1Data, setP1Data] = useState([]);
+    const [P2Data, setP2Data] = useState([]);
 
-    const [statsData, setStatsData] = useState([]);
-    const [barLabels, setBarLabels] = useState([]);
-      
-    const handleLeagueChange = (event) => {
-        setLeagueValue(event.target.value);
-    };
-
-    const handleYearChange = (event) => {
-        setYearValue(event.target.value);
-    };
-
-    const handleClubChange = (event) => {
-        setClubValue(event.target.value);
-    };
-
-    const handleNameChange = (event) => {
-        setNameValue(event.target.value);
-    };
+    const [P1, setP1] = useState([]);
+    const [P2, setP2] = useState([]);
     
-    const isClubDisabled = !leagueValue || !yearValue;
-    const isNameDisabled = !clubValue;
+    const [barLabels, setBarLabels] = useState([]);
+    const [attribute, setAttribute] = useState('');
 
+    const handlePlayer1Data = (data) => {
+        console.log(data);
+        setP1Data(data);
+        setP1Stats(stripData(data));
+
+    }
+
+    const handlePlayer2Data = (data) => {
+        console.log(data);
+        setP2Data(data);
+        setP2Stats(stripData(data));
+    }
+    
+    function showAttributes(tabNumber) {
+        if (tabNumber==1) { setAttribute('F') }
+        if (tabNumber==2) { setAttribute('M') }
+        if (tabNumber==3) { setAttribute('D') }
+        if (tabNumber==4) { setAttribute('G') }
+    };
+
+    const handleOnLoad = () => {
+        showAttributes(1); 
+
+        const firstTab = document.getElementById('radio-1');
+
+        // Check first tab if it exists
+        if (firstTab) { firstTab.checked = true; }
+    };
+
+    // On Load
     useEffect(() => {
-        const fetchTeams = async () => {
-            try {
-                const response = await axios.get(`http://localhost:8000/fetchTeams?league=${leagueValue}&season=${yearValue}`);
-                setTeamData(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
+        handleOnLoad();
+    }, []);
 
-        const fetchPlayers = async () => {
-            try {
-                const response = await axios.get(`http://localhost:8000/fetchPlayers?league=${leagueValue}&season=${yearValue}&team=${clubValue}`);
-                setPlayerData(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        const fetchStats = async () => {
-            try {
-                const response = await axios.get(`http://localhost:8000/fetchStats?league=${leagueValue}&season=${yearValue}&team=${clubValue}&name=${nameValue}`);
-                stripStats(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        // Check if both leagueValue and yearValue are not empty before making the API call
-        if (leagueValue && yearValue && clubValue && nameValue) {
-            fetchStats();
-        } else if (leagueValue && yearValue && clubValue) {
-            fetchPlayers();
-        } else if (leagueValue && yearValue) {
-            fetchTeams();
-            //testStats();
-        }
-
-        // Once values have changed
-    }, [leagueValue, yearValue, clubValue, nameValue]);
-
+    // Update Chart
     useEffect(() => {
-        if (statsData && statsData.length > 0) {
-                
+        if (P1.length > 0 && P2?.length > 0) {
+            console.log(P1, P2);
+            // Chart set-up and defaults
             let radarChart = null;   
             const radarChartCanvas = document.getElementById('radarChart').getContext('2d');
             const graphSpace = document.getElementById('graph-square');
             graphSpace.classList.add('graph-visible');
-
             Chart.defaults.scale.ticks.beginAtZero = true;
             Chart.defaults.borderColor = '#000D2E';
             Chart.defaults.color = '#000D2E';
+            Chart.register(ChartDataLabels);
+            
+            // Normalize data
+            var P1Norm = [];
+            var P2Norm = [];
+
+            for (let i = 0; i < P1.length; i++) {
+                const maxValue = Math.max(P1[i], P2[i]);
+                P1Norm.push(P1[i]/(maxValue*1.1).toFixed(2));
+                P2Norm.push(P2[i]/(maxValue*1.1).toFixed(2));
+            }
+
+            // Custom labels
+            var P1Name = P1Data[0].player.name;
+            var P1Season = (P1Data[0].statistics[0].league.season).toString().slice(2) + '/' + (P1Data[0].statistics[0].league.season+1).toString().slice(2);
+
+            var P2Name = P2Data[0].player.name;
+            var P2Season = (P2Data[0].statistics[0].league.season).toString().slice(2) + '/' + (P2Data[0].statistics[0].league.season+1).toString().slice(2);
+
 
             radarChart = new Chart(radarChartCanvas, {
                 type: 'radar',
@@ -96,23 +94,85 @@ const Page = () => {
                     labels: barLabels,
                     datasets: [
                         {
-                            label: 'Bukayo Saka',
-                            backgroundColor: 'rgba(00, 255, 00, 0.1)',
-                            borderColor: 'rgba(00, 255, 00, 0.5)',
+                            label: `${P1Name} (${P1Season})`,
+                            backgroundColor: 'rgba(255, 75, 0, 0.1)',
+                            borderColor: 'rgba(255, 75, 0, 0.5)',
+                            pointBorderColor: 'rgba(255, 75, 0, 1)',
+                            pointBackgroundColor: 'rgba(255, 75, 0, 1)',
+                            pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
+                            pointHoverBorderColor: 'rgba(255, 75, 0, 1)',
                             borderWidth: 2,
-                            data: statsData,
+                            data: P1Norm,
+                            custom: P1,
                         },
-                        {
-                            label: 'Phil Foden',
-                            backgroundColor: 'rgba(00, 00, 255, 0.1)',
-                            borderColor: 'rgba(00, 00, 255, 0.5)',
+                        ...(P2 && P2Data[0].player.name ? 
+                        [{
+                            label: `${P2Name} (${P2Season})`,
+                            backgroundColor: 'rgba(0, 125, 255, 0.1)',
+                            borderColor: 'rgba(0, 125, 255, 0.5)',
+                            pointBorderColor: 'rgba(0, 125, 255, 1)',
+                            pointBackgroundColor: 'rgba(0, 125, 255, 1)',
+                            pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
+                            pointHoverBorderColor: 'rgba(0, 125, 255, 1)',
                             borderWidth: 2,
-                            data: [0.12, 0.15, 0.23, 0.12, 0.12, 0.45, 0.42, 0.04, 0.20],
-                        },
+                            data: P2Norm,
+                            custom: P2,
+                        }]
+                        : [])
                     ],
                 },
                 options: {
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 1,
+                            ticks: {
+                                display: false,
+                            },
+                            angleLines: {
+                                color: 'grey'
+                            },
+                            grid: {
+                                color: 'grey',
+                            },
+                            pointLabels: {
+                            }
+                        }
+                    }, /*
+                    onHover: (event, elements) => {
+                        // Access the custom property to get the original unnormalized data
+                        
+                        console.log(elements);
+                        if (elements.length > 0) {
+                            const datasetIndex = elements[0].datasetIndex;
+                            const dataIndex = elements[0].index;
+                            const unnormalizedValue = radarChart.data.datasets[datasetIndex].custom[dataIndex];
+                            console.log(unnormalizedValue);
+                        }
+                    }, */
                     responsive: true,
+                    plugins: {
+                        datalabels: {
+                            formatter: function(value, context) {
+                                const datasetIndex = context.datasetIndex;
+                                const dataIndex = context.dataIndex;
+                                const unnormalizedValue = context.chart.data.datasets[datasetIndex].custom[dataIndex];
+                                return unnormalizedValue;
+                            },
+                            color: function(context) {
+                                const datasetIndex = context.datasetIndex;
+                                const dataset = context.chart.data.datasets[datasetIndex];
+                                return dataset.borderColor;
+                            },
+                            anchor: 'end',
+                            align: 'start',
+                            font: {
+                                size: 18,
+                                family: 'Poppins, sans-serif',
+                                weight: 'bold',
+                            },
+                        }
+                    }
                 },
             });
 
@@ -121,50 +181,63 @@ const Page = () => {
                 radarChart.destroy()
             }
         }
-    }, [statsData]);
+    }, [P1Stats, P2Stats, P1, P2]);
 
-    function testStats() {
-        var forwardStats = [0.10, 0.30, 0.30, 0.2, 0.78, 0.3, 0.65, 0.12, 0.02];
-        setStatsData(forwardStats);
-        var forwardLabels = ['Goals', 'Shots', 'Shots On Target', 'Duels Won', 'Duels Won Rate', 'Dribbles', 'Dribbles Rate', 'Fouls Drawn', 'Penalties Won'];
-        setBarLabels(forwardLabels);
-    }
+    useEffect(() => {
+        if (P1Stats.length > 0 && P2Stats?.length > 0) {
+            var attackerLabels = ['Goals', 'Shots', 'Shots On Target', 'Duels Won', 'Duels Won %', 'Dribbles', 'Dribbles %', 'Fouls Drawn'];
+            var midfieldLabels = ['Assists', 'Key Passes', 'Passes', 'Passes %', 'Duels Won', 'Duels Won %', 'Fouls Drawn', 'Fouls Committed'];
+            var defenceLabels = ['Tackles', 'Blocks', 'Interceptions', 'Dribbled Past', 'Fouls Committed', 'Yellows', 'Reds', 'Penalties Committed'];
+            var goalkeeperLabels = ['Saves', 'Goals Conceded', 'Saves Per Concede', 'Passes', 'Passes %', 'Penalties Saved'];
 
-    function stripStats(statsData) {
+            if (attribute=='F') { setP1(P1Stats[0]); setP2(P2Stats[0]); setBarLabels(attackerLabels) };
+            if (attribute=='M') { setP1(P1Stats[1]); setP2(P2Stats[1]); setBarLabels(midfieldLabels); }
+            if (attribute=='D') { setP1(P1Stats[2]); setP2(P2Stats[2]); setBarLabels(defenceLabels); }
+            if (attribute=='G') { setP1(P1Stats[3]); setP2(P2Stats[3]); setBarLabels(goalkeeperLabels); }
+        }
+    }, [attribute, P1Stats, P2Stats]);
+
+    function stripData(statsData) {
+
 
         var stats = statsData[0].statistics[0];
-        //console.log(stats);
         var full90s = stats.games.minutes/90;
 
-        // Forward Stats
+        // Attacker Stats
         var goals = (stats.goals.total / full90s).toFixed(2);
         var shots = (stats.shots.total / full90s).toFixed(2);
         var shotsOnTarget = (stats.shots.on / full90s).toFixed(2); 
         var duelsWon = (stats.duels.won / full90s).toFixed(2);
-        var duelsWonRate = ((stats.duels.won / stats.duels.total)).toFixed(2);
+        var duelsWonRate = ((stats.duels.won / stats.duels.total)*100).toFixed(0);
         var dribbles = (stats.dribbles.success / full90s).toFixed(2);
-        var dribblesRate = ((stats.dribbles.success / stats.dribbles.attempts)).toFixed(2);
+        var dribblesRate = ((stats.dribbles.success / stats.dribbles.attempts)*100).toFixed(0);
         var foulsDrawn = (stats.fouls.drawn / full90s).toFixed(2);
         var penaltiesWon = (stats.penalty.won / full90s).toFixed(2);
 
-        var forwardStats = [goals, shots, shotsOnTarget, duelsWon, duelsWonRate, dribbles, dribblesRate, foulsDrawn, penaltiesWon];
-        setStatsData(forwardStats);
-
-        var forwardLabels = ['Goals', 'Shots', 'Shots On Target', 'Duels Won', 'Duels Won Rate', 'Dribbles', 'Dribbles Rate', 'Fouls Drawn', 'Penalties Won'];
-        setBarLabels(forwardLabels);
-
-
+        // var attackerStats = [goals, shots, shotsOnTarget, duelsWon, duelsWonRate, dribbles, dribblesRate, foulsDrawn, penaltiesWon];
+        var attackerStats = [goals, shots, shotsOnTarget, duelsWon, duelsWonRate, dribbles, dribblesRate, foulsDrawn];
+        
         // Midfield Stats
         var assists = (stats.goals.assists / full90s).toFixed(2);
-        var passes = ((stats.passes.total*stats.passes.accuracy/100) / full90s).toFixed(2);
-        var passessRate = stats.passes.accuracy.toFixed(2);
+        var keyPasses = (stats.passes.key / full90s).toFixed(2);
+
+        var passes, passessRate;
+
+        // API switched formula from % to total accurate passes in 20/21 season
+        if (stats.league.season >= 2020) {
+            passes = (stats.passes.accuracy).toFixed(2)
+            passessRate = ((stats.passes.accuracy / (stats.passes.total / full90s))*100).toFixed(0);
+        } else {
+            passes = ((stats.passes.total*stats.passes.accuracy/100) / full90s).toFixed(0);
+            passessRate = (stats.passes.accuracy).toFixed(0);
+        }
+
         var duelsWon;
         var duelsWonRate;
         var foulsDrawn;
         var foulsCommitted = (stats.fouls.committed / full90s).toFixed(2);
 
-        var midfieldStats = [assists, passes, passessRate, duelsWon, duelsWonRate, foulsDrawn, foulsCommitted];
-        //console.log(midfieldStats);
+        var midfieldStats = [assists, keyPasses, passes, passessRate, duelsWon, duelsWonRate, foulsDrawn, foulsCommitted];
 
         // Defence Stats
         var tackles = (stats.tackles.total / full90s).toFixed(2);
@@ -177,92 +250,50 @@ const Page = () => {
         var penaltiesCommited = (stats.penalty.commited / full90s).toFixed(2);
 
         var defenceStats = [tackles, blocks, interceptions, dribbledPast, foulsCommitted, yellows, reds, penaltiesCommited];
-        //console.log(defenceStats);
-    
+
+        // Goalkeeper Stats
+        var saves = (stats.goals.saves / full90s).toFixed(2);
+        var goalsConceded = (stats.goals.conceded / full90s).toFixed(2);
+        var savePerConceded = (stats.goals.saves / stats.goals.conceded).toFixed(0);
+        var passes;
+        var passessRate;
+        var penaltiesSaved = (stats.penalty.saved / full90s).toFixed(2);
+        
+        var goalkeeperStats = [saves, goalsConceded, savePerConceded, passes, passessRate, penaltiesSaved];
+
+        return [attackerStats, midfieldStats, defenceStats, goalkeeperStats];
     }
+
 
     return (
       <>
         <div class="main-page row">
             <div class="stats-side">
                 <div class="players">
-                    <div class="player">
-                        <h4>Choose a Player</h4>
-                        <div class="dropdowns">
-                            <div class="season">
-                                <div class="league">
-                                    <label htmlFor="league">League </label>
-                                    <select id="league" class="league" value={leagueValue} onChange={handleLeagueChange}>
-                                        <option value="" defaultValue></option>
-                                        <option value="39">Premier League</option>
-                                        <option value="140">La Liga</option>
-                                        <option value="135">Serie A</option>
-                                        <option value="78">Bundesliga</option>
-                                        <option value="61">Ligue 1</option>
-                                    </select>
-                                </div>
-
-                                <div class="year">
-                                    <label htmlFor="year">Year </label>
-                                    <select id="year" class="year" value={yearValue} onChange={handleYearChange}>
-                                        <option value="" defaultValue></option>
-                                        <option value="2023">23/24</option>
-                                        <option value="2022">22/23</option>
-                                        <option value="2021">21/22</option>
-                                        <option value="2020">20/21</option>
-                                        <option value="2019">19/20</option>
-                                        <option value="2018">18/19</option>
-                                        <option value="2017">17/18</option>
-                                        <option value="2016">16/17</option>
-                                        <option value="2015">15/16</option>
-                                        <option value="2014">14/15</option>
-                                        <option value="2013">13/14</option>
-                                        <option value="2012">12/13</option>
-                                        <option value="2011">11/12</option>
-                                        <option value="2010">10/11</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <label htmlFor="club">Club </label>
-                            <select id="club" class="club" value={clubValue} onChange={handleClubChange} disabled={isClubDisabled}>
-                                <option value="" defaultValue></option>
-                                {/* Map over the team data and populate the club dropdown */}
-                                {teamData.map((team) => (
-                                <option key={team.id} value={team.id}>
-                                    {team.name}
-                                </option>
-                                ))};
-                            </select>
-
-                            <label htmlFor="name">Name </label>
-                            <select id="club" class="club" value={nameValue} onChange={handleNameChange} disabled={isNameDisabled}>
-                                <option value="" defaultValue></option>
-                                {/* Map over the team data and populate the club dropdown */}
-                                {playerData.map((player) => (
-                                <option key={player.id} value={player.id}>
-                                    {player.name}
-                                </option>
-                                ))};
-                            </select>
-                        </div>
-
-                    </div>
-
-
-                    <div class="player">
-                        
-                    </div>
+                    <Player playerID="player1" onStatsChange={handlePlayer1Data} ></Player>
+                    <Player playerID="player2" onStatsChange={handlePlayer2Data} ></Player>
                 </div>
             </div>
             <div class="graph-side">
                 <div class="graph-container">
                     <div id="graph-square" class="graph-square">
-                        <div class="names-header">
-
-                        </div>
-                        <div class="attributes-header">
-                            
+                        <div class="attributes-tab">
+                            <label class="radio">
+                                <input type="radio" name="radio" id="radio-1" onClick={() => showAttributes(1)}/>
+                                <span class="name">Attacker</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="radio" id="radio-2" onClick={() => showAttributes(2)}/>
+                                <span class="name">Midfielder</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="radio" id="radio-3" onClick={() => showAttributes(3)}/>
+                                <span class="name">Defender</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="radio" id="radio-4" onClick={() => showAttributes(4)}/>
+                                <span class="name">Goalkeeper</span>
+                            </label>
                         </div>
                         <canvas id="radarChart" class="radar-chart"></canvas>
                     </div>

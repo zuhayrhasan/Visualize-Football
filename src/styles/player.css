@@ -2,8 +2,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    height: 550px;
+    transform: translate(-45%, -50%);
+    height: 500px;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -12,17 +12,18 @@
 }
 
 .player {
-    height: 500px;
+    height: 400px;
     width: 200px;
-    padding: 1% 2%;
+    padding: 1% 3%;
     border-radius: 10px;
     margin-right: 20px;
     background: linear-gradient(145deg, var(--box-color), #d5d5d5);
     box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
 }
 
 .player h4 {
-    margin: 0;
     color: var(--box-text);
     text-align: center;
     margin-bottom: 5%;
@@ -30,8 +31,10 @@
 
 .dropdowns {
     border-top: 1.5px solid var(--background);
-    border-bottom: 1.5px solid var(--background);
-    padding: 10% 0%;
+    height: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
 }
 
 .players .player:last-child {
@@ -42,11 +45,12 @@
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
     width: 100%;
+    height: 17.5px;
     border-radius: 50px;
     border: 0;
     outline: 0;
-    margin-bottom: 15px !important;
-    padding: 2.5px 7.5px;
+    padding: 0% 5%;
+    margin-bottom: 5px;
     color: var(--box-text);
     transition: all 0.25s ease-in-out;
     box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.1);
@@ -58,10 +62,6 @@
 
 .year select {
     text-align: center;
-}
-
-.dropdowns select:last-child {
-    margin-bottom: 5%;
 }
 
 .dropdowns select:disabled {
@@ -80,12 +80,37 @@
     display: none;
 }
 
-.dropdowns label {
+.dropdown-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.dropdown-row label {
     font-family: 'Poppins', sans-serif;
     color: var(--box-text);
     font-size: 12px;
     font-weight: 500;
     margin-left: 2.5px;
+}
+.first-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.first-row > .league-item {
+    flex-direction: column;
+    width: 64%;
+}
+
+.first-row > .year-item {
+    flex-direction: column;
+    width: 29%;
+}
+
+.first-row > .year-item option {
+    text-align: center;
 }
 
 .dropdowns > .season {
@@ -93,29 +118,48 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: flex-end;
 }
 
-.season > .league {
-    width: 64%;
-}
-
-.season > .year {
-    width: 29%;
-}
-
-.league, .year select {
+.profile {
+    border-top: 1.5px solid var(--background);
+    border-bottom: 1.5px solid var(--background);
+    height: 45%;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    text-align: center;
 }
 
-.player > .club, .player > .name {
-    width: 100%;
+.display-player img[src] {
+    display: block;
+    width: 75px;
+    border: 2px solid var(--box-text);
+    border-radius: 50%;
+}
+
+.h5-season, .h5-club, .h5-player {
+    color: var(--box-text);
+    font-weight: 400;
+    line-height: 17.5px;
+}
+
+.h5-club {
+    margin-bottom: 20px;
+}
+
+.h5-player {
+    font-weight: 700;
 }
 
 @media (max-width: 768px) {
 
-    .player-container {
+    .players {
         height: 400px;
-        width: 200px;
+        width: 90%;
+        transform: translate(-50%, -50%);
     }
-    
 }

@@ -19,20 +19,28 @@ const Page = () => {
     const [P1, setP1] = useState([]);
     const [P2, setP2] = useState([]);
     
+    const [valid, setValid] = useState([]);
     const [barLabels, setBarLabels] = useState([]);
     const [attribute, setAttribute] = useState('');
 
     const handlePlayer1Data = (data) => {
-        console.log(data);
-        setP1Data(data);
-        setP1Stats(stripData(data));
-
+        if (data && data.length > 0) {
+            setP1Data(data);
+            setP1Stats(stripData(data));
+            setValid('valid');
+        } else {
+            setValid(data);
+        }
     }
 
     const handlePlayer2Data = (data) => {
-        console.log(data);
-        setP2Data(data);
-        setP2Stats(stripData(data));
+        if (data && data.length > 0) {
+            setP2Data(data);
+            setP2Stats(stripData(data));
+            setValid('valid');
+        } else {
+            setValid(data);
+        }
     }
     
     function showAttributes(tabNumber) {
@@ -58,12 +66,11 @@ const Page = () => {
 
     // Update Chart
     useEffect(() => {
-        if (P1.length > 0 && P2?.length > 0) {
-            console.log(P1, P2);
+        const graphSpace = document.getElementById('graph-square');
+        if (valid && P1.length > 0 && P2.length > 0) {
             // Chart set-up and defaults
             let radarChart = null;   
             const radarChartCanvas = document.getElementById('radarChart').getContext('2d');
-            const graphSpace = document.getElementById('graph-square');
             graphSpace.classList.add('graph-visible');
             Chart.defaults.scale.ticks.beginAtZero = true;
             Chart.defaults.borderColor = '#000D2E';
@@ -74,10 +81,17 @@ const Page = () => {
             var P1Norm = [];
             var P2Norm = [];
 
+            var reverseValues = ["Fouls Committed", "Dribbled Past", "Yellows", "Reds", "Goals Conceded"]
+
             for (let i = 0; i < P1.length; i++) {
                 const maxValue = Math.max(P1[i], P2[i]);
-                P1Norm.push(P1[i]/(maxValue*1.1).toFixed(2));
-                P2Norm.push(P2[i]/(maxValue*1.1).toFixed(2));
+                if (!reverseValues.includes(barLabels[i])) {
+                    P1Norm.push(P1[i]/(maxValue*1.1).toFixed(2));
+                    P2Norm.push(P2[i]/(maxValue*1.1).toFixed(2));
+                } else { // If it is a negative statistic, flip it's placement
+                    P2Norm.push(P1[i]/(maxValue*1.1).toFixed(2));
+                    P1Norm.push(P2[i]/(maxValue*1.1).toFixed(2));
+                }
             }
 
             // Custom labels
@@ -138,18 +152,7 @@ const Page = () => {
                             pointLabels: {
                             }
                         }
-                    }, /*
-                    onHover: (event, elements) => {
-                        // Access the custom property to get the original unnormalized data
-                        
-                        console.log(elements);
-                        if (elements.length > 0) {
-                            const datasetIndex = elements[0].datasetIndex;
-                            const dataIndex = elements[0].index;
-                            const unnormalizedValue = radarChart.data.datasets[datasetIndex].custom[dataIndex];
-                            console.log(unnormalizedValue);
-                        }
-                    }, */
+                    }, 
                     responsive: true,
                     plugins: {
                         datalabels: {
@@ -171,17 +174,40 @@ const Page = () => {
                                 family: 'Poppins, sans-serif',
                                 weight: 'bold',
                             },
-                        }
-                    }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    console.log(context);
+                                    const stat = context.label;
+                                    const name = context.dataset.label;
+                                    const datasetIndex = context.datasetIndex;
+                                    const dataIndex = context.dataIndex;
+
+                                    const unnormalizedValue = radarChart.data.datasets[datasetIndex].custom[dataIndex];
+
+                                    // Check if stat ends with "%"
+                                    if (stat.endsWith("%")) {
+                                        return name + ": " + unnormalizedValue.toString() + "%";
+                                    } else {
+                                        return name + ": " + unnormalizedValue.toString();
+                                    }
+                                },
+                            },
+                        },
+                    },
                 },
             });
-
             
             return () => {
-                radarChart.destroy()
+                radarChart.destroy();
             }
+
+        } else {
+            graphSpace.classList.remove('graph-visible');
         }
-    }, [P1Stats, P2Stats, P1, P2]);
+
+    }, [P1Stats, P2Stats, P1, P2, valid]);
 
     useEffect(() => {
         if (P1Stats.length > 0 && P2Stats?.length > 0) {
@@ -198,9 +224,9 @@ const Page = () => {
     }, [attribute, P1Stats, P2Stats]);
 
     function stripData(statsData) {
-
-
-        var stats = statsData[0].statistics[0];
+        console.log("----");
+        console.log(statsData);
+        var stats = statsData[0]?.statistics[0];
         var full90s = stats.games.minutes/90;
 
         // Attacker Stats
@@ -229,7 +255,7 @@ const Page = () => {
             passessRate = ((stats.passes.accuracy / (stats.passes.total / full90s))*100).toFixed(0);
         } else {
             passes = ((stats.passes.total*stats.passes.accuracy/100) / full90s).toFixed(0);
-            passessRate = (stats.passes.accuracy).toFixed(0);
+            passessRate = (stats.passes.accuracy !== null) ? stats.passes.accuracy.toFixed(0) : 0;
         }
 
         var duelsWon;

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto'; 
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import axios from 'axios';
 import '../styles/page.css';
 import '../styles/player.css';
 import '../styles/graph.css';

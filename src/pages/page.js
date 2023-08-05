@@ -68,6 +68,8 @@ const Page = () => {
     useEffect(() => {
         const graphSpace = document.getElementById('graph-square');
         if (valid && P1.length > 0 && P2.length > 0) {
+            
+        console.log(P2);
             // Chart set-up and defaults
             let radarChart = null;   
             const radarChartCanvas = document.getElementById('radarChart').getContext('2d');
@@ -224,8 +226,6 @@ const Page = () => {
     }, [attribute, P1Stats, P2Stats]);
 
     function stripData(statsData) {
-        console.log("----");
-        console.log(statsData);
         var stats = statsData[0]?.statistics[0];
         var full90s = stats.games.minutes/90;
 
@@ -254,7 +254,7 @@ const Page = () => {
             passes = (stats.passes.accuracy).toFixed(2)
             passessRate = ((stats.passes.accuracy / (stats.passes.total / full90s))*100).toFixed(0);
         } else {
-            passes = ((stats.passes.total*stats.passes.accuracy/100) / full90s).toFixed(0);
+            passes = ((stats.passes.total*stats.passes.accuracy/100) / full90s).toFixed(2);
             passessRate = (stats.passes.accuracy !== null) ? stats.passes.accuracy.toFixed(0) : 0;
         }
 

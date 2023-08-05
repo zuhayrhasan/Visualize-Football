@@ -257,9 +257,6 @@ const Page = () => {
             passessRate = (stats.passes.accuracy !== null) ? stats.passes.accuracy.toFixed(0) : 0;
         }
 
-        var duelsWon;
-        var duelsWonRate;
-        var foulsDrawn;
         var foulsCommitted = (stats.fouls.committed / full90s).toFixed(2);
 
         var midfieldStats = [assists, keyPasses, passes, passessRate, duelsWon, duelsWonRate, foulsDrawn, foulsCommitted];
@@ -269,7 +266,6 @@ const Page = () => {
         var blocks = (stats.tackles.blocks / full90s).toFixed(2);
         var interceptions = (stats.tackles.interceptions / full90s).toFixed(2);
         var dribbledPast = (stats.dribbles.past / full90s).toFixed(2);
-        var foulsCommitted;
         var yellows = (stats.cards.yellow / full90s).toFixed(2);
         var reds = (stats.cards.red / full90s).toFixed(2);
         var penaltiesCommited = (stats.penalty.commited / full90s).toFixed(2);
@@ -280,8 +276,6 @@ const Page = () => {
         var saves = (stats.goals.saves / full90s).toFixed(2);
         var goalsConceded = (stats.goals.conceded / full90s).toFixed(2);
         var savePerConceded = (stats.goals.saves / stats.goals.conceded).toFixed(0);
-        var passes;
-        var passessRate;
         var penaltiesSaved = (stats.penalty.saved / full90s).toFixed(2);
         
         var goalkeeperStats = [saves, goalsConceded, savePerConceded, passes, passessRate, penaltiesSaved];

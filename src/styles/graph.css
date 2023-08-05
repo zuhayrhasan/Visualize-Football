@@ -79,10 +79,6 @@
 
 @media (max-width: 768px) {
 
-    .attributes-tab {
-        font-size: 12px
-    }
-
     .graph-container {
         transform: translate(-50%, -50%);
     }

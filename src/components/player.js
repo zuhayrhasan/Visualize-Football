@@ -67,7 +67,7 @@ const Player = ({ playerID, onStatsChange }) => {
     useEffect(() => {
         const fetchTeams = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/fetchTeams?league=${leagueValue}&season=${yearValue}`);
+                const response = await axios.get(`https://visualizefootball.netlify.app/fetchTeams?league=${leagueValue}&season=${yearValue}`);
                 setTeamData(response.data);
             } catch (error) {
                 console.error(error);
@@ -76,7 +76,7 @@ const Player = ({ playerID, onStatsChange }) => {
 
         const fetchPlayers = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/fetchPlayers?league=${leagueValue}&season=${yearValue}&team=${clubValue}`);
+                const response = await axios.get(`https://visualizefootball.netlify.app/fetchPlayers?league=${leagueValue}&season=${yearValue}&team=${clubValue}`);
                 setPlayerData(response.data);
             } catch (error) {
                 setChosenPlayer(null);
@@ -86,7 +86,7 @@ const Player = ({ playerID, onStatsChange }) => {
 
         const fetchStats = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/fetchStats?league=${leagueValue}&season=${yearValue}&team=${clubValue}&name=${nameValue}`);
+                const response = await axios.get(`https://visualizefootball.netlify.app/fetchStats?league=${leagueValue}&season=${yearValue}&team=${clubValue}&name=${nameValue}`);
                 //stripStats(response.data);
                 console.log(response.data);
                 onStatsChange(response.data);
